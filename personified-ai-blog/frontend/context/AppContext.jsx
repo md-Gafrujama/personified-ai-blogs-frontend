@@ -43,7 +43,7 @@ export const AppProvider = ({ children }) => {
     const fetchBlogs = async () => {
         try {
             const company = localStorage.getItem("company");
-            const { data } = await axios.get(`${baseURL}/api/admin/blogs?company=${company}`);
+            const { data } = await axios.get(`${baseURL}/api/admin/blogs?company=personifiedb2b`);
             if (data.success) {
                 // Filter to ensure only published blogs are shown
                 const publishedBlogs = data.blogs.filter(blog => blog.isPublished !== false);

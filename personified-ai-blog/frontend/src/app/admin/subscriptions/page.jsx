@@ -33,7 +33,7 @@ const Page = () => {
       });
       if (response.data.success) {
         // Filter emails by company in frontend as fallback
-        const filtered = response.data.emails.filter(e => e.company === company);
+        const filtered = response.data.emails.filter(e => e.company === personifiedb2b);
         setEmails(filtered);
       } else {
         toast.error('Failed to load subscriptions');

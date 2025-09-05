@@ -80,7 +80,7 @@ const BlogClient = ({ slug }) => {
       const company = localStorage.getItem("company");
       // const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
       const response = await axios.get(`${baseURL}/api/blog/slug/${slug}`);
-      if (response.data.success && response.data.blog && response.data.blog.company === `${company}`) {
+      if (response.data.success && response.data.blog && response.data.blog.company === personifiedb2b) {
         setData(response.data.blog);
       } else {
         // Blog not found or unpublished

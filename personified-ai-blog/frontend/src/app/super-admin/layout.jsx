@@ -4,7 +4,7 @@ import Image from "next/image";
 import { ToastContainer} from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { AppProvider } from "@/context/AppContext"; // <-- import your provider
-import Navbar from "@/Components/Navbar";
+import Navbar from "@/Components/NavbarNew";
 import PrivateComponent from "@/Components/privateComponent";
 export default function Layout({ children }) {
     return (

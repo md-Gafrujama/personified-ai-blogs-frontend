@@ -4,10 +4,6 @@ import { motion, AnimatePresence } from "motion/react";
 import axios from "axios";
 import { baseURL } from "@/config/api";
 
-// ✅ Safe localStorage access (avoids SSR error in Next.js)
-const company =
-  typeof window !== "undefined" ? localStorage.getItem("company") : null;
-
 // Blog categories
 const blogCategories = [
   "All",
@@ -47,7 +43,7 @@ const BlogCard = ({ blog }) => {
     >
       {/* Main Card Container */}
       <div className="relative bg-white rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_25px_50px_-12px_rgba(56,104,97,0.3)] transition-all duration-500 border-l-4 border-[#F7D270] hover:border-l-8">
-        {/* Image Section with Overlay */}
+        {/* Image Section */}
         <div className="relative h-64 overflow-hidden">
           <img
             src={image || "/default-blog.jpg"} // ✅ fallback image
@@ -55,10 +51,9 @@ const BlogCard = ({ blog }) => {
             className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
           />
 
-          {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#294944]/80 via-[#294944]/40 to-transparent"></div>
 
-          {/* Floating Category */}
+          {/* Category */}
           {category && (
             <div className="absolute top-4 right-4">
               <span className="inline-block px-3 py-1 bg-[#F7D270] text-[#294944] text-xs font-bold rounded-full shadow-lg">
@@ -69,11 +64,7 @@ const BlogCard = ({ blog }) => {
 
           {/* Reading Time */}
           <div className="absolute bottom-4 left-4 flex items-center space-x-2 text-white">
-            <svg
-              className="w-4 h-4"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
               <path
                 fillRule="evenodd"
                 d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
@@ -84,7 +75,7 @@ const BlogCard = ({ blog }) => {
           </div>
         </div>
 
-        {/* Content Section */}
+        {/* Content */}
         <div className="p-6">
           <h3 className="text-xl font-bold text-[#294944] mb-3 line-clamp-2 group-hover:text-[#386861] transition-colors duration-300">
             {title}
@@ -98,7 +89,7 @@ const BlogCard = ({ blog }) => {
             }}
           />
 
-          {/* Read More Button */}
+          {/* Read More */}
           <div className="flex items-center justify-between">
             <button className="flex items-center space-x-2 text-[#386861] hover:text-[#294944] font-semibold transition-colors duration-200">
               <span>Read More</span>
@@ -130,7 +121,7 @@ const BlogCard = ({ blog }) => {
           </div>
         </div>
 
-        {/* Animated Border */}
+        {/* Hover Border */}
         <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#F7D270]/50 rounded-3xl transition-all duration-300"></div>
       </div>
     </motion.div>
@@ -145,16 +136,25 @@ const BlogList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
   const [viewMode, setViewMode] = useState("grid");
+  const [company, setCompany] = useState(null);
+
+  // ✅ get company from localStorage after client mounts
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedCompany = localStorage.getItem("company") || "personifiedb2b";
+      setCompany(storedCompany);
+    }
+  }, []);
 
   const fetchBlogs = async () => {
+    if (!company) return; // wait until company is loaded
     setIsLoading(true);
     try {
       const response = await axios.get(
-        `${baseURL}/api/admin/blogs?company=personifiedb2b`
+        `${baseURL}/api/admin/blogs?company=${company}`
       );
-      const filteredBlogs = response.data?.blogs?.filter(
-        (blog) => blog.company === "personifiedb2b"
-      ) || [];
+      const filteredBlogs =
+        response.data?.blogs?.filter((blog) => blog.company === company) || [];
       setBlogs(filteredBlogs);
       setSearchResults(filteredBlogs);
     } catch (error) {
@@ -165,6 +165,10 @@ const BlogList = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchBlogs();
+  }, [company]);
 
   const handleSearch = (searchTerm) => {
     setInput(searchTerm);
@@ -196,13 +200,9 @@ const BlogList = () => {
     return filtered;
   };
 
-  useEffect(() => {
-    fetchBlogs();
-  }, []);
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#F7D270]/5 to-[#386861]/10">
-      {/* Hero Section */}
+      {/* Hero */}
       <section className="relative bg-gradient-to-r from-[#294944] via-[#386861] to-[#294944] text-white py-20">
         <div className="absolute inset-0 bg-black/20"></div>
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
@@ -226,7 +226,6 @@ const BlogList = () => {
 
       {/* Blog Content */}
       <div className="max-w-7xl mx-auto px-6 py-12">
-        {/* Loading State */}
         {isLoading ? (
           <div className="flex justify-center items-center py-20">
             <p className="text-[#294944] text-lg font-medium">

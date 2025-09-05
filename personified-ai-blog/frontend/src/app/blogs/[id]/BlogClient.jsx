@@ -80,7 +80,7 @@ const BlogClient = ({ slug }) => {
       const company = localStorage.getItem("company");
       // const baseURL = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
       const response = await axios.get(`${baseURL}/api/blog/slug/${slug}`);
-      if (response.data.success && response.data.blog && response.data.blog.company === personifiedb2b) {
+      if (response.data.success && response.data.blog && response.data.blog.company === 'personifiedb2b') {
         setData(response.data.blog);
       } else {
         // Blog not found or unpublished
@@ -229,7 +229,7 @@ const onSubmitHandler = async (e) => {
             // Filter by same category, exclude current blog, limit to 3 and same company
             const company = localStorage.getItem("company");
             const related = response.data.blogs.filter(
-              (b) => b.category === data.category && b.slug !== data.slug && b.isPublished !== false && b.company === `${comapany}`
+              (b) => b.category === data.category && b.slug !== data.slug && b.isPublished !== false && b.company === 'personifiedb2b'
             ).slice(0, 3);
             setRelatedBlogs(related);
           }

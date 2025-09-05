@@ -115,7 +115,7 @@ const BlogList = () => {
     setIsLoading(true);
     try {
       const response = await axios.get(`${baseURL}/api/admin/blogs?company=personifiedb2b`);
-      const filteredBlogs = response.data.blogs.filter(blog => blog.company === personifiedb2b);
+      const filteredBlogs = response.data.blogs.filter(blog => blog.company === 'personifiedb2b');
       setBlogs(filteredBlogs);
       setSearchResults(filteredBlogs);
     } catch (error) {

@@ -136,7 +136,7 @@ const Page = () => {
     formData.append('authorImg', data.authorImg);
     formData.append('image', image);
     formData.append('isPublished', isPublished);
-    formData.append('company', company);
+    formData.append('company', 'personifiedb2b');
 
     try {
       setLoading(true)

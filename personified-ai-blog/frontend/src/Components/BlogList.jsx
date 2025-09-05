@@ -2,7 +2,9 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import axios from "axios";
-import { baseURL } from "@/config/api";
+import { baseURL, company} from "@/config/api";
+
+const  Company = company;
 
 // Blog categories
 const blogCategories = [
@@ -15,7 +17,7 @@ const blogCategories = [
   "Sales",
 ];
 
-// ✅ Blog Card Component
+
 const BlogCard = ({ blog }) => {
   const { title, description = "", category, image, _id, slug } = blog;
 
@@ -128,7 +130,7 @@ const BlogCard = ({ blog }) => {
   );
 };
 
-// ✅ Blog List Component
+
 const BlogList = () => {
   const [menu, setMenu] = useState("All");
   const [blogs, setBlogs] = useState([]);
@@ -136,18 +138,21 @@ const BlogList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [searchResults, setSearchResults] = useState([]);
   const [viewMode, setViewMode] = useState("grid");
-  const [company, setCompany] = useState(null);
+  const [company, setCompany] = useState("");
 
-  // ✅ get company from localStorage after client mounts
+ 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedCompany = localStorage.getItem("company") || "personifiedb2b";
-      setCompany(storedCompany);
+   
+      setCompany(Company);
+      console.log(company);
     }
   }, []);
 
+ 
+
   const fetchBlogs = async () => {
-    if (!company) return; // wait until company is loaded
+    if (!company) return; 
     setIsLoading(true);
     try {
       const response = await axios.get(

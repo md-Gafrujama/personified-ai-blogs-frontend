@@ -9,7 +9,7 @@ import axios from 'axios';
 import Head from 'next/head';
 import BlogItem from '@/Components/BlogItem';
 import { motion } from 'framer-motion';
-import NavbarNew from "@/Components/NavbarNew";
+import NavbarNew from "@/Components/Navbar";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFacebookF, faTwitter, faGooglePlusG, faLinkedinIn } from '@fortawesome/free-brands-svg-icons';
 import { baseURL , company} from '@/config/api';
@@ -258,7 +258,7 @@ const onSubmitHandler = async (e) => {
           </button> */}
         </div>
         <div className='text-center my-44'>
-          <h1 className='text-2xl sm:text-5xl font-semibold max-w-[700px] mx-auto'>{data.title}</h1>
+        <h1 className='text-2xl sm:text-5xl font-semibold max-w-[700px]'>{data.title}</h1>
           {/* <Image className='mx-auto mt-6 border border-white rounded-full' src={data.authorImg} width={60} height={60} alt='' /> */}
           <p className='mt-1 pb-2 text-lg max-w-[740px] mx-auto'>{data.author}</p>
           {/* Blog date and time */}

@@ -1,13 +1,13 @@
 import BlogClient from './BlogClient';
-
+import { baseURL } from '@/config/api';
 // Generate metadata for each individual blog
 export async function generateMetadata({ params }) {
   console.log('Generating metadata for slug:', params.id);
   
   try {
     // Get base URL with fallback
-    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
-    console.log('Using base URL:', baseUrl);
+    // const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:5000';
+    console.log('Using base URL:', baseURL);
     
     // Fetch blog data by slug using native fetch (server-side)
     const apiUrl = `${baseUrl}/api/blog/slug/${params.id}`;

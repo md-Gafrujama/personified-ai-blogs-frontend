@@ -5,8 +5,6 @@ import axios from 'axios';
 import BlogItem from '@/Components/BlogItem';
 import { baseURL } from '@/config/api';
 
-const company = localStorage.getItem("company");
-
 // Blog categories
 const blogCategories = ["All", "ABM", "Advertising", "Content Creation", "Demand Generation", "Intent Data", "Sales"];
 
@@ -23,7 +21,7 @@ const BlogCard = ({ blog }) => {
     return Math.ceil(words / wordsPerMinute);
   };
   
-  const readingTime = calculateReadingTime(description);
+  const readingTime = calculateReadingTime(description || '');
   
   return (
     <motion.div
@@ -42,8 +40,8 @@ const BlogCard = ({ blog }) => {
         {/* Image Section with Overlay - Fixed height */}
         <div className="relative h-48 overflow-hidden flex-shrink-0">
           <img
-            src={image}
-            alt={title}
+            src={image || '/default-blog-image.jpg'}
+            alt={title || 'Blog post'}
             className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
           />
           
@@ -53,7 +51,7 @@ const BlogCard = ({ blog }) => {
           {/* Floating Category */}
           <div className="absolute top-4 right-4">
             <span className="inline-block px-3 py-1 bg-[#F7D270] text-[#294944] text-xs font-bold rounded-full shadow-lg">
-              {category}
+              {category || 'General'}
             </span>
           </div>
           
@@ -71,7 +69,7 @@ const BlogCard = ({ blog }) => {
           {/* Title - Fixed height */}
           <div className="h-16 flex items-start mb-3">
             <h3 className="text-xl font-bold text-[#294944] group-hover:text-[#386861] transition-colors duration-300 line-clamp-2 leading-tight">
-              {title}
+              {title || 'Untitled Post'}
             </h3>
           </div>
           
@@ -79,7 +77,7 @@ const BlogCard = ({ blog }) => {
           <div className="h-20 mb-4">
             <div 
               className="text-gray-600 text-sm leading-relaxed line-clamp-4"
-              dangerouslySetInnerHTML={{ "__html": description.slice(0, 150) + "..." }}
+              dangerouslySetInnerHTML={{ "__html": (description || '').slice(0, 150) + "..." }}
             />
           </div>
           
@@ -121,15 +119,34 @@ const BlogList = () => {
   const [isSearching, setIsSearching] = useState(false);
   const [viewMode, setViewMode] = useState('grid');
   
+  // Move company inside component to avoid localStorage issues during SSR
+  const [company, setCompany] = useState('');
+  
+  useEffect(() => {
+    // Set company from localStorage after component mounts
+    const companyFromStorage = localStorage.getItem("company");
+    setCompany(companyFromStorage || 'personifiedb2b');
+  }, []);
+  
   const fetchBlogs = async () => {
+    if (!company) return; // Wait for company to be set
+    
     setIsLoading(true);
     try {
-      const response = await axios.get(`${baseURL}/api/admin/blogs?company=personifiedb2b`);
-      const filteredBlogs = response.data.blogs.filter(blog => blog.company === `${company}`);
-      setBlogs(filteredBlogs);
-      setSearchResults(filteredBlogs);
+      // Use the company value directly in the API call
+      const response = await axios.get(`${baseURL}/api/admin/blogs?company=${company}`);
+      console.log("API Response:", response.data);
+      
+      // Handle different possible response structures
+      const allBlogs = response.data.blogs || response.data || [];
+      console.log("Total blogs fetched:", allBlogs.length);
+      
+      setBlogs(allBlogs);
+      setSearchResults(allBlogs);
     } catch (error) {
       console.error('Error fetching blogs:', error);
+      setBlogs([]);
+      setSearchResults([]);
     } finally {
       setIsLoading(false);
     }
@@ -144,9 +161,9 @@ const BlogList = () => {
     }
     setIsSearching(true);
     const filtered = blogs.filter((blog) => 
-      blog.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-      blog.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      blog.description.toLowerCase().includes(searchTerm.toLowerCase())
+      blog.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+      blog.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      blog.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setSearchResults(filtered);
     setIsSearching(false);
@@ -168,8 +185,10 @@ const BlogList = () => {
   };
   
   useEffect(() => {
-    fetchBlogs();
-  }, []);
+    if (company) {
+      fetchBlogs();
+    }
+  }, [company]); // Fetch blogs when company is set
   
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#F7D270]/5 to-[#386861]/10">
@@ -258,19 +277,13 @@ const BlogList = () => {
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.1 }}
-                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 ${
+                className={`px-6 py-3 rounded-full font-semibold transition-all duration-300 relative ${
                   menu === item 
                     ? 'bg-gradient-to-r from-[#386861] to-[#294944] text-[#F7D270] shadow-lg transform scale-105' 
                     : 'bg-white text-[#294944] hover:bg-[#F7D270]/20 hover:text-[#386861] shadow-md hover:shadow-lg border border-[#386861]/20'
                 }`}
               >
                 {item}
-                {menu === item && (
-                  <motion.div
-                    layoutId="activeTab"
-                    className="absolute inset-0 bg-gradient-to-r from-[#386861] to-[#294944] rounded-full -z-10"
-                  />
-                )}
               </motion.button>
             ))}
           </div>
@@ -307,7 +320,7 @@ const BlogList = () => {
               {getFilteredBlogs().length > 0 ? (
                 getFilteredBlogs().map((item, index) => (
                   <motion.div
-                    key={item._id}
+                    key={item._id || index}
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.4, delay: index * 0.1 }}
@@ -331,6 +344,11 @@ const BlogList = () => {
                     <p className="text-[#386861] text-lg">
                       {input ? `No results match "${input}". Try adjusting your search.` : 'No articles available in this category.'}
                     </p>
+                    {/* Debug info */}
+                    <div className="mt-4 text-sm text-gray-500">
+                      <p>Company: {company || 'Not set'}</p>
+                      <p>Total blogs loaded: {blogs.length}</p>
+                    </div>
                   </div>
                 </motion.div>
               )}

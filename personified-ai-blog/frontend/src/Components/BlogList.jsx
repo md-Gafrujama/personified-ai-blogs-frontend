@@ -12,33 +12,32 @@ const blogCategories = ["All", "ABM", "Advertising", "Content Creation", "Demand
 
 const BlogCard = ({ blog }) => {
   const { title, description, category, image, _id, slug } = blog;
-
+  
   const handleClick = () => {
     window.location.href = `/blogs/${slug || _id}`;
   };
-
+  
   const calculateReadingTime = (text) => {
     const wordsPerMinute = 200;
     const words = text.replace(/<[^>]+>/g, '').split(' ').length;
     return Math.ceil(words / wordsPerMinute);
   };
-
+  
   const readingTime = calculateReadingTime(description);
-
+  
   return (
     <motion.div
       onClick={handleClick}
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ 
-        // Removed scale and movement - only shadow/border effects now
         transition: { duration: 0.2 }
       }}
       transition={{ duration: 0.3, ease: "easeOut" }}
       className="group relative cursor-pointer h-full"
     >
       {/* Main Card Container - Fixed height structure */}
-      <div className="relative bg-white rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_25px_50px_-12px_rgba(56,104,97,0.3)] transition-all duration-500 border-l-4 border-[#F7D270] hover:border-l-8 flex flex-col h-[480px]"> {/* Fixed exact height */}
+      <div className="relative bg-white rounded-3xl overflow-hidden shadow-2xl hover:shadow-[0_25px_50px_-12px_rgba(56,104,97,0.3)] transition-all duration-500 border-l-4 border-[#F7D270] hover:border-l-8 flex flex-col h-[480px]">
         
         {/* Image Section with Overlay - Fixed height */}
         <div className="relative h-48 overflow-hidden flex-shrink-0">
@@ -66,18 +65,18 @@ const BlogCard = ({ blog }) => {
             <span className="text-sm font-medium">{readingTime} min</span>
           </div>
         </div>
-
+        
         {/* Content Section - Fixed structure with equal heights */}
-        <div className="p-6 flex-1 flex flex-col h-60"> {/* Fixed height for content area */}
+        <div className="p-6 flex-1 flex flex-col h-60">
           {/* Title - Fixed height */}
-          <div className="h-16 flex items-start mb-3"> {/* Fixed container height */}
+          <div className="h-16 flex items-start mb-3">
             <h3 className="text-xl font-bold text-[#294944] group-hover:text-[#386861] transition-colors duration-300 line-clamp-2 leading-tight">
               {title}
             </h3>
           </div>
           
           {/* Description - Fixed height */}
-          <div className="h-20 mb-4"> {/* Fixed height for description */}
+          <div className="h-20 mb-4">
             <div 
               className="text-gray-600 text-sm leading-relaxed line-clamp-4"
               dangerouslySetInnerHTML={{ "__html": description.slice(0, 150) + "..." }}
@@ -104,7 +103,7 @@ const BlogCard = ({ blog }) => {
             </div>
           </div>
         </div>
-
+        
         {/* Animated Border Effect */}
         <div className="absolute inset-0 border-2 border-transparent group-hover:border-[#F7D270]/50 rounded-3xl transition-all duration-300"></div>
       </div>
@@ -112,7 +111,7 @@ const BlogCard = ({ blog }) => {
   );
 };
 
-// Main BlogList component (rest remains the same)
+// Main BlogList component
 const BlogList = () => {
   const [menu, setMenu] = useState("All");
   const [blogs, setBlogs] = useState([]);
@@ -121,7 +120,7 @@ const BlogList = () => {
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [viewMode, setViewMode] = useState('grid');
-
+  
   const fetchBlogs = async () => {
     setIsLoading(true);
     try {
@@ -135,7 +134,7 @@ const BlogList = () => {
       setIsLoading(false);
     }
   }
-
+  
   const handleSearch = async (searchTerm) => {
     setInput(searchTerm);
     if (!searchTerm.trim()) {
@@ -143,25 +142,23 @@ const BlogList = () => {
       setIsSearching(false);
       return;
     }
-
     setIsSearching(true);
     const filtered = blogs.filter((blog) => 
       blog.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
       blog.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
       blog.description.toLowerCase().includes(searchTerm.toLowerCase())
     );
-
     setSearchResults(filtered);
     setIsSearching(false);
   }
-
+  
   useEffect(() => {
     const timer = setTimeout(() => {
       handleSearch(input);
     }, 300);
     return () => clearTimeout(timer);
   }, [input, blogs]);
-
+  
   const getFilteredBlogs = () => {
     let filtered = searchResults;
     if (menu !== "All") {
@@ -169,11 +166,11 @@ const BlogList = () => {
     }
     return filtered;
   };
-
+  
   useEffect(() => {
     fetchBlogs();
   }, []);
-
+  
   return (
     <div className="min-h-screen bg-gradient-to-br from-white via-[#F7D270]/5 to-[#386861]/10">
       {/* Hero Section */}
@@ -185,7 +182,6 @@ const BlogList = () => {
           <div className="absolute top-20 right-20 w-24 h-24 bg-[#F7D270]/20 rounded-full blur-xl animate-pulse delay-700"></div>
           <div className="absolute bottom-10 left-1/3 w-40 h-40 bg-[#F7D270]/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
         </div>
-
         <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -204,7 +200,7 @@ const BlogList = () => {
           </motion.div>
         </div>
       </section>
-
+      
       <div className="max-w-7xl mx-auto px-6 py-12">
         {/* Control Panel */}
         <div className="mb-12 bg-white rounded-2xl shadow-xl p-6 border-t-4 border-[#F7D270]">
@@ -224,7 +220,6 @@ const BlogList = () => {
                 className="w-full pl-12 pr-4 py-3 border-2 border-[#386861]/20 rounded-xl focus:outline-none focus:border-[#F7D270] focus:ring-2 focus:ring-[#F7D270]/20 transition-all duration-300"
               />
             </div>
-
             <div className="flex items-center space-x-2 bg-[#386861]/10 rounded-lg p-1">
               <button
                 onClick={() => setViewMode('grid')}
@@ -247,13 +242,12 @@ const BlogList = () => {
                 </svg>
               </button>
             </div>
-
             <div className="text-sm text-[#294944] font-medium">
               {getFilteredBlogs().length} article{getFilteredBlogs().length !== 1 ? 's' : ''}
             </div>
           </div>
         </div>
-
+        
         {/* Category Filter */}
         <div className="mb-12">
           <div className="flex flex-wrap justify-center gap-3">
@@ -281,7 +275,7 @@ const BlogList = () => {
             ))}
           </div>
         </div>
-
+        
         {/* Loading State */}
         {isLoading && (
           <div className="flex justify-center items-center py-20">
@@ -294,7 +288,7 @@ const BlogList = () => {
             </div>
           </div>
         )}
-
+        
         {/* Blog Content */}
         {!isLoading && (
           <AnimatePresence mode="wait">
@@ -343,7 +337,7 @@ const BlogList = () => {
             </motion.div>
           </AnimatePresence>
         )}
-
+        
         {/* Footer Stats */}
         {!isLoading && getFilteredBlogs().length > 0 && (
           <motion.div
